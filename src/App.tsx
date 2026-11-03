@@ -93,7 +93,16 @@ export default function App() {
         />
       )}
       {tab === 'calendar' && <CalendarView now={now} drinks={drinks} />}
-      {tab === 'scan' && <ScanView onLogManually={() => setTab('today')} />}
+      {tab === 'scan' && (
+        <ScanView
+          now={now}
+          onAdd={(name, mg) => {
+            add(name, mg)
+            setTab('today')
+          }}
+          onLogManually={() => setTab('today')}
+        />
+      )}
 
       <footer className="mt-2 space-y-2 text-center text-xs text-[var(--muted)]">
         <p>Educational tool, not medical advice. The 50 mg bedtime line is a heuristic.</p>

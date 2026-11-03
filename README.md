@@ -20,7 +20,7 @@ Log what you drank and Cutoff shows a live curve of the caffeine in your body. I
 - Metabolism: Manual slider (half-life 3–7 h) or Auto, which learns it from Apple Health sleep data (iPhone app, coming soon; sample data for the demo)
 - Everything is stored locally in the browser: no login, no backend
 - Calendar tab: daily caffeine totals coloured against 400 mg, with monthly stats
-- Scan tab: take a photo of a drink (caffeine recognition coming soon)
+- Scan tab (preview): scan a can's barcode with the camera or a photo; caffeine comes from built-in verified cans (Bloom Crisp Apple, Coca-Cola Zero Sugar US cans), else Open Food Facts label data or a brand estimate. Photo recognition of any drink comes later
 - Demo day: tap "Load demo day" in the footer, or triple-tap the logo
 
 ## The model
