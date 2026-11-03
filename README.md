@@ -1,0 +1,46 @@
+# Cutoff
+
+Know exactly when your last coffee or energy drink should be, so it doesn't wreck your sleep.
+
+Log what you drank and Cutoff shows a live curve of the caffeine in your body. It predicts how much will be left at bedtime and gives you a personal caffeine cutoff time for today.
+
+> Your 16:00 coffee is still in your body at midnight. Cutoff shows you when to stop.
+
+## Features
+
+- Quick-add drinks (espresso, coffee, teas, cola, energy drinks) or a custom mg amount
+- Edit the time of any logged drink
+- Caffeine curve from 06:00 to 06:00, with "now", "bed" and a 50 mg sleep-safe line
+- Bedtime card with a traffic light: green < 50 mg, yellow 50–100 mg, red > 100 mg
+- "Last safe coffee" time: the latest time one more 95 mg coffee still leaves you under 50 mg at bedtime
+- Daily total against the 400 mg/day guideline
+- Metabolism slider (half-life 3–7 h)
+- Everything is stored locally in the browser: no login, no backend
+- Demo day: tap "Load demo day" in the footer, or triple-tap the logo
+
+## The model
+
+A one-compartment pharmacokinetic model with first-order absorption. For each drink with dose D mg, Δt hours after drinking:
+
+```
+A(Δt) = D · ka / (ka − ke) · (e^(−ke·Δt) − e^(−ka·Δt))
+ke = ln 2 / half-life   (5 h → 0.139 /h)
+ka = 4 /h               (peak ≈ 50 min after drinking)
+```
+
+The total in your body is the sum over all drinks. See [`src/lib/caffeine.ts`](src/lib/caffeine.ts).
+
+## Run it
+
+```bash
+npm install
+npm run dev     # http://localhost:5173
+npm test        # model tests
+npm run build
+```
+
+Built with Vite, React, TypeScript, Tailwind CSS and Recharts.
+
+---
+
+Educational tool, not medical advice. The 50 mg bedtime threshold is a heuristic.

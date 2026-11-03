@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f6f5f2;
+  --card: #ffffff;
+  --ink: #1c1b22;
+  --muted: #8a8794;
+  --grid: #ece9e4;
+  --accent: #4f46e5;
+  --good: #059669;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111017;
+    --card: #1b1a23;
+    --ink: #f1eff6;
+    --muted: #8f8b9c;
+    --grid: #2a2833;
+    --accent: #8b85ff;
+    --good: #34d399;
+    color-scheme: dark;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* In a layer so Tailwind utilities (e.g. the status colours) can override it. */
+@layer components {
+  .card {
+    background: var(--card);
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.04);
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Compact native time inputs: tap the value to edit, no picker icon. */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
