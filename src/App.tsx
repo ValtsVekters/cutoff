@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { MetabolismCard } from './components/MetabolismCard'
 import type { Drink } from './lib/caffeine'
 import { DEMO_DAY } from './lib/drinks'
+import { DEFAULT_HALF_LIFE_H, SAMPLE_HEALTH, type HealthSource, type MetabolismMode } from './lib/health'
 import { atClock, dayStart } from './lib/time'
 import { useStored } from './lib/useStored'
 import { CalendarView } from './views/CalendarView'
@@ -15,8 +17,13 @@ export default function App() {
   const [tab, setTab] = useStored<Tab>('cutoff.tab', 'today')
   const [drinks, setDrinks] = useStored<Drink[]>('cutoff.drinks', [])
   const [bedClock, setBedClock] = useStored('cutoff.bedtime', '23:00')
-  const [halfLife, setHalfLife] = useStored('cutoff.halfLife', 5)
+  const [halfLife, setHalfLife] = useStored('cutoff.halfLife', DEFAULT_HALF_LIFE_H)
+  const [mode, setMode] = useStored<MetabolismMode>('cutoff.metabolismMode', 'manual')
+  const [health, setHealth] = useStored<HealthSource>('cutoff.health', 'none')
   const [now, setNow] = useState(() => Date.now())
+
+  // Auto uses the half-life learned from sleep data; Normal until connected.
+  const effectiveHalfLife = mode === 'manual' ? halfLife : health === 'sample' ? SAMPLE_HEALTH.halfLifeH : DEFAULT_HALF_LIFE_H
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 30_000)
@@ -67,12 +74,21 @@ export default function App() {
           now={now}
           drinks={drinks}
           bedClock={bedClock}
-          halfLife={halfLife}
+          halfLife={effectiveHalfLife}
+          metabolism={
+            <MetabolismCard
+              mode={mode}
+              health={health}
+              manualHalfLife={halfLife}
+              onMode={setMode}
+              onHealth={setHealth}
+              onManualHalfLife={setHalfLife}
+            />
+          }
           onAdd={add}
           onRemove={remove}
           onRetime={retime}
           onBedClock={setBedClock}
-          onHalfLife={setHalfLife}
         />
       )}
       {tab === 'calendar' && <CalendarView now={now} drinks={drinks} />}

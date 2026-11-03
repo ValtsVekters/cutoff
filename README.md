@@ -16,7 +16,7 @@ Log what you drank and Cutoff shows a live curve of the caffeine in your body. I
 - Bedtime card with a traffic light: green < 50 mg, yellow 50–100 mg, red > 100 mg
 - "Last safe coffee" time: the latest time one more 95 mg coffee still leaves you under 50 mg at bedtime
 - Daily total against the 400 mg/day guideline
-- Metabolism slider (half-life 3–7 h)
+- Metabolism: Manual slider (half-life 3–7 h) or Auto, which learns it from Apple Health sleep data (iPhone app, coming soon; sample data for the demo)
 - Everything is stored locally in the browser: no login, no backend
 - Calendar tab: daily caffeine totals coloured against 400 mg, with monthly stats
 - Scan tab: take a photo of a drink (caffeine recognition coming soon)

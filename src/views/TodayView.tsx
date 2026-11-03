@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type ReactNode } from 'react'
 import { CaffeineChart } from '../components/CaffeineChart'
 import { amountAt, curve, cutoffTime, DAILY_LIMIT_MG, SAFE_MG, WARN_MG, type Drink } from '../lib/caffeine'
 import { label, PRESETS } from '../lib/drinks'
@@ -12,21 +12,19 @@ const STATUS = {
   bad: { box: 'bg-rose-50 text-rose-900 dark:bg-rose-950/60 dark:text-rose-100', dot: 'bg-rose-500', label: 'Likely to hurt sleep' },
 }
 
-const METABOLISM: Record<number, string> = { 3: 'Fast', 4: 'Fast', 5: 'Normal', 6: 'Slow', 7: 'Slow' }
-
 type Props = {
   now: number
   drinks: Drink[]
   bedClock: string
   halfLife: number
+  metabolism: ReactNode
   onAdd: (name: string, mg: number) => void
   onRemove: (id: string) => void
   onRetime: (id: string, time: number) => void
   onBedClock: (hhmm: string) => void
-  onHalfLife: (h: number) => void
 }
 
-export function TodayView({ now, drinks, bedClock, halfLife, onAdd, onRemove, onRetime, onBedClock, onHalfLife }: Props) {
+export function TodayView({ now, drinks, bedClock, halfLife, metabolism, onAdd, onRemove, onRetime, onBedClock }: Props) {
   const [customMg, setCustomMg] = useState('')
 
   const from = dayStart(now)
@@ -159,27 +157,7 @@ export function TodayView({ now, drinks, bedClock, halfLife, onAdd, onRemove, on
         )}
       </section>
 
-      <section className="card">
-        <div className="mb-2 flex items-center justify-between text-sm">
-          <h2 className="font-medium text-[var(--muted)]">Your metabolism</h2>
-          <span className="num font-medium">{METABOLISM[halfLife]} · {halfLife} h half-life</span>
-        </div>
-        <input
-          type="range"
-          min={3}
-          max={7}
-          step={1}
-          value={halfLife}
-          onChange={(e) => onHalfLife(Number(e.target.value))}
-          className="w-full accent-[var(--accent)]"
-          aria-label="Caffeine half-life in hours"
-        />
-        <div className="mt-1 flex justify-between text-xs text-[var(--muted)]">
-          <span>Fast</span>
-          <span>Normal</span>
-          <span>Slow</span>
-        </div>
-      </section>
+      {metabolism}
     </>
   )
 }
