@@ -2,6 +2,8 @@
 
 Know exactly when your last coffee or energy drink should be, so it doesn't wreck your sleep.
 
+**Live app:** https://cutoff-nu.vercel.app
+
 Log what you drank and Cutoff shows a live curve of the caffeine in your body. It predicts how much will be left at bedtime and gives you a personal caffeine cutoff time for today.
 
 > Your 16:00 coffee is still in your body at midnight. Cutoff shows you when to stop.
