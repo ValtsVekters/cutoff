@@ -21,3 +21,9 @@ export function clock(t: number): string {
   const d = new Date(t)
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
+
+/** Calendar key ("2026-11-03") of the app-day a timestamp belongs to. */
+export function dayKey(t: number): string {
+  const d = new Date(dayStart(t))
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}

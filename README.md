@@ -8,7 +8,7 @@ Log what you drank and Cutoff shows a live curve of the caffeine in your body. I
 
 ## Features
 
-- Quick-add drinks (espresso, coffee, teas, cola, energy drinks) or a custom mg amount
+- Quick-add drinks (Cola, Bloom, Red Bull, Monster, coffee, espresso, green tea) or a custom mg amount
 - Edit the time of any logged drink
 - Caffeine curve from 06:00 to 06:00, with "now", "bed" and a 50 mg sleep-safe line
 - Bedtime card with a traffic light: green < 50 mg, yellow 50–100 mg, red > 100 mg
@@ -16,6 +16,8 @@ Log what you drank and Cutoff shows a live curve of the caffeine in your body. I
 - Daily total against the 400 mg/day guideline
 - Metabolism slider (half-life 3–7 h)
 - Everything is stored locally in the browser: no login, no backend
+- Calendar tab: daily caffeine totals coloured against 400 mg, with monthly stats
+- Scan tab: take a photo of a drink (caffeine recognition coming soon)
 - Demo day: tap "Load demo day" in the footer, or triple-tap the logo
 
 ## The model
