@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { MetabolismCard } from './components/MetabolismCard'
 import type { Drink } from './lib/caffeine'
-import { DEMO_DAY } from './lib/drinks'
+import { withDemo } from './lib/drinks'
 import { DEFAULT_HALF_LIFE_H, SAMPLE_HEALTH, type HealthSource, type MetabolismMode } from './lib/health'
-import { atClock, dayStart } from './lib/time'
+import { dayStart } from './lib/time'
 import { useStored } from './lib/useStored'
 import { CalendarView } from './views/CalendarView'
 import { ScanView } from './views/ScanView'
@@ -15,7 +15,8 @@ const newId = () => Math.random().toString(36).slice(2, 10)
 
 export default function App() {
   const [tab, setTab] = useStored<Tab>('cutoff.tab', 'today')
-  const [drinks, setDrinks] = useStored<Drink[]>('cutoff.drinks', [])
+  // First-time visitors (e.g. from the pitch QR code) open straight into the demo.
+  const [drinks, setDrinks] = useStored<Drink[]>('cutoff.drinks', () => withDemo([], dayStart(Date.now()), newId))
   const [bedClock, setBedClock] = useStored('cutoff.bedtime', '23:00')
   const [halfLife, setHalfLife] = useStored('cutoff.halfLife', DEFAULT_HALF_LIFE_H)
   const [mode, setMode] = useStored<MetabolismMode>('cutoff.metabolismMode', 'manual')
@@ -39,14 +40,9 @@ export default function App() {
   const remove = (id: string) => setDrinks((ds) => ds.filter((d) => d.id !== id))
   const retime = (id: string, time: number) => setDrinks((ds) => ds.map((d) => (d.id === id ? { ...d, time } : d)))
 
-  // Replaces only today's log, so the calendar history survives a demo.
   const loadDemo = () => {
-    const from = dayStart(Date.now())
     setBedClock('23:00')
-    setDrinks((ds) => [
-      ...ds.filter((d) => d.time < from),
-      ...DEMO_DAY.map((d) => ({ id: newId(), name: d.name, mg: d.mg, time: atClock(d.at, from) })),
-    ])
+    setDrinks((ds) => withDemo(ds, dayStart(Date.now()), newId))
     setTab('today')
   }
   const clearToday = () => {

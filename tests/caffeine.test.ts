@@ -1,7 +1,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { amountAt, budgetAt, cutoffTime, upcomingPeak, type Drink } from '../src/lib/caffeine.ts'
-import { clock, hourLabel, inputClock } from '../src/lib/time.ts'
+import { clock, dayKey, hourLabel, inputClock } from '../src/lib/time.ts'
+import { sampleHistory } from '../src/lib/drinks.ts'
 
 const H = 3_600_000
 const coffee = (time: number): Drink => ({ id: 'c', name: 'Coffee', mg: 95, time })
@@ -69,6 +70,18 @@ test('times display as US AM/PM, inputs stay 24-hour', () => {
   assert.equal(clock(at(16, 30)), '4:30 PM')
   assert.equal(hourLabel(at(18)), '6 PM')
   assert.equal(inputClock(at(16, 30)), '16:30')
+})
+
+test('sample history fills about two months before today, the same every time', () => {
+  const from = new Date(2026, 10, 19, 6).getTime()
+  const history = sampleHistory(from)
+  assert.deepEqual(history, sampleHistory(from))
+  assert.ok(history.every((d) => d.time < from && d.time >= from - 60 * 24 * H))
+  const days = new Set(history.map((d) => dayKey(d.time)))
+  assert.ok(days.size >= 45 && days.size <= 60, `${days.size} days`)
+  const totals = [...days].map((k) => history.filter((d) => dayKey(d.time) === k).reduce((s, d) => s + d.mg, 0))
+  assert.ok(totals.some((t) => t > 400), 'some days over 400 mg')
+  assert.ok(totals.some((t) => t <= 200), 'some light days')
 })
 
 test('no cutoff when already over the limit', () => {
