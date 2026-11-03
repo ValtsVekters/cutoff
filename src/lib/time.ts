@@ -17,9 +17,23 @@ export function atClock(hhmm: string, start: number): number {
   return d.getTime()
 }
 
-export function clock(t: number): string {
+/** "HH:MM" for <input type="time"> values (the browser shows them as AM/PM itself). */
+export function inputClock(t: number): string {
   const d = new Date(t)
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
+
+/** US-style 12-hour time: "4:00 PM". */
+export function clock(t: number): string {
+  const d = new Date(t)
+  const h = d.getHours() % 12 || 12
+  return `${h}:${String(d.getMinutes()).padStart(2, '0')} ${d.getHours() < 12 ? 'AM' : 'PM'}`
+}
+
+/** Short hour label for chart axes: "6 AM", "12 PM". */
+export function hourLabel(t: number): string {
+  const hours = new Date(t).getHours()
+  return `${hours % 12 || 12} ${hours < 12 ? 'AM' : 'PM'}`
 }
 
 /** Calendar key ("2026-11-03") of the app-day a timestamp belongs to. */

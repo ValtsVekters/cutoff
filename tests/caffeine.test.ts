@@ -1,6 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { amountAt, budgetAt, cutoffTime, upcomingPeak, type Drink } from '../src/lib/caffeine.ts'
+import { clock, hourLabel, inputClock } from '../src/lib/time.ts'
 
 const H = 3_600_000
 const coffee = (time: number): Drink => ({ id: 'c', name: 'Coffee', mg: 95, time })
@@ -59,6 +60,15 @@ test('budget shrinks the later you drink', () => {
 
 test('no budget when already over the limit', () => {
   assert.equal(budgetAt([{ ...coffee(20 * H), mg: 400 }], 21 * H, 23 * H), 0)
+})
+
+test('times display as US AM/PM, inputs stay 24-hour', () => {
+  const at = (h: number, m = 0) => new Date(2026, 10, 3, h, m).getTime()
+  assert.equal(clock(at(0, 5)), '12:05 AM')
+  assert.equal(clock(at(12)), '12:00 PM')
+  assert.equal(clock(at(16, 30)), '4:30 PM')
+  assert.equal(hourLabel(at(18)), '6 PM')
+  assert.equal(inputClock(at(16, 30)), '16:30')
 })
 
 test('no cutoff when already over the limit', () => {

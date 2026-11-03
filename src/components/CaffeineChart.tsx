@@ -1,13 +1,14 @@
 import { Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { SAFE_MG, type Point } from '../lib/caffeine'
-import { clock } from '../lib/time'
+import { clock, hourLabel } from '../lib/time'
 
 type Props = { data: Point[]; from: number; to: number; now: number; bedtime: number }
 
 const HOUR = 3_600_000
 
 export function CaffeineChart({ data, from, to, now, bedtime }: Props) {
-  const ticks = Array.from({ length: 9 }, (_, i) => from + i * 3 * HOUR)
+  // Every 6 h, so "12 PM"-style labels fit on a phone.
+  const ticks = Array.from({ length: 5 }, (_, i) => from + i * 6 * HOUR)
   const maxMg = Math.max(120, ...data.map((p) => p.mg))
 
   return (
@@ -25,7 +26,7 @@ export function CaffeineChart({ data, from, to, now, bedtime }: Props) {
           type="number"
           domain={[from, to]}
           ticks={ticks}
-          tickFormatter={(t: number) => clock(t).slice(0, 2)}
+          tickFormatter={(t: number) => hourLabel(t)}
           tick={{ fontSize: 11, fill: 'var(--muted)' }}
           axisLine={false}
           tickLine={false}

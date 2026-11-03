@@ -13,7 +13,7 @@ import {
   type Drink,
 } from '../lib/caffeine'
 import { label, PRESETS } from '../lib/drinks'
-import { atClock, clock, dayStart } from '../lib/time'
+import { atClock, clock, dayStart, inputClock } from '../lib/time'
 
 const HOUR = 3_600_000
 const DAY = 24 * HOUR
@@ -123,7 +123,7 @@ export function TodayView({ now, drinks, bedClock, halfLife, metabolism, onAdd, 
       </section>
 
       <section className="card px-2 pb-2">
-        <h2 className="px-3 text-sm font-medium text-[var(--muted)]">Caffeine in body · 06:00 → 06:00</h2>
+        <h2 className="px-3 text-sm font-medium text-[var(--muted)]">Caffeine in body · 6 AM → 6 AM</h2>
         <CaffeineChart data={data} from={from} to={to} now={now} bedtime={bedtime} />
       </section>
 
@@ -177,7 +177,7 @@ export function TodayView({ now, drinks, bedClock, halfLife, metabolism, onAdd, 
               <li key={d.id} className="flex items-center gap-3 py-2 text-sm">
                 <input
                   type="time"
-                  value={clock(d.time)}
+                  value={inputClock(d.time)}
                   onChange={(e) => e.target.value && onRetime(d.id, atClock(e.target.value, from))}
                   className="num rounded-md bg-transparent px-1 py-0.5 text-[var(--muted)]"
                   aria-label={`Time of ${d.name}`}
