@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { amountAt, cutoffTime, type Drink } from '../src/lib/caffeine.ts'
+import { amountAt, budgetAt, cutoffTime, upcomingPeak, type Drink } from '../src/lib/caffeine.ts'
 
 const H = 3_600_000
 const coffee = (time: number): Drink => ({ id: 'c', name: 'Coffee', mg: 95, time })
@@ -32,6 +32,33 @@ test('cutoff for an empty day is well before bedtime', () => {
   const cut = cutoffTime([], 6 * H, bed)
   assert.ok(cut !== null)
   assert.ok(bed - cut! > 4.5 * H && bed - cut! < 5.5 * H, `cutoff ${(bed - cut!) / H} h before bed`)
+})
+
+test('a drink just taken shows an upcoming peak ~50 min later', () => {
+  const peak = upcomingPeak([coffee(0)], 0)
+  assert.ok(peak !== null)
+  const minutes = peak!.time / 60_000
+  assert.ok(minutes > 45 && minutes < 60, `peak after ${minutes} min`)
+  assert.ok(peak!.mg > 80 && peak!.mg < 90, `peak ${peak!.mg}`)
+})
+
+test('no upcoming peak once the level is falling', () => {
+  assert.equal(upcomingPeak([coffee(0)], 3 * H), null)
+})
+
+test('budget taken now lands exactly on the limit at bedtime', () => {
+  const day = [coffee(8 * H)]
+  const b = budgetAt(day, 10 * H, 23 * H)
+  const atBed = amountAt([...day, { ...coffee(10 * H), id: 'b', mg: b }], 23 * H)
+  assert.ok(Math.abs(atBed - 50) < 1e-6, `bedtime ${atBed}`)
+})
+
+test('budget shrinks the later you drink', () => {
+  assert.ok(budgetAt([], 10 * H, 23 * H) > budgetAt([], 16 * H, 23 * H))
+})
+
+test('no budget when already over the limit', () => {
+  assert.equal(budgetAt([{ ...coffee(20 * H), mg: 400 }], 21 * H, 23 * H), 0)
 })
 
 test('no cutoff when already over the limit', () => {

@@ -44,6 +44,35 @@ export function curve(
 }
 
 /**
+ * Highest level within the next `horizonMin` minutes, so the UI can say
+ * "still absorbing, peaks at X mg". Returns null if the level only falls.
+ */
+export function upcomingPeak(drinks: Drink[], now: number, halfLifeH = 5, horizonMin = 180): Point | null {
+  const current = amountAt(drinks, now, halfLifeH)
+  let peak: Point = { time: now, mg: current }
+  for (let t = now + MIN; t <= now + horizonMin * MIN; t += MIN) {
+    const mg = amountAt(drinks, t, halfLifeH)
+    if (mg > peak.mg) peak = { time: t, mg }
+  }
+  return peak.mg - current >= 1 ? peak : null
+}
+
+/** Smallest drink worth suggesting (about a cola). */
+export const MIN_DRINK_MG = 30
+
+/**
+ * Most caffeine (mg) you could take at time t and still be under `limitMg`
+ * at bedtime. The model is linear in dose, so it's the remaining room
+ * divided by what 1 mg taken at t leaves at bedtime.
+ */
+export function budgetAt(drinks: Drink[], t: number, bedtime: number, halfLifeH = 5, limitMg = SAFE_MG): number {
+  if (t >= bedtime) return 0
+  const room = limitMg - amountAt(drinks, bedtime, halfLifeH)
+  const perMg = amountAt([{ id: 'unit', name: 'unit', mg: 1, time: t }], bedtime, halfLifeH)
+  return room > 0 ? room / perMg : 0
+}
+
+/**
  * Latest time between `now` and `bedtime` (5-min steps) at which one more
  * `testMg` drink still keeps the bedtime level under `limitMg`. null = none.
  */

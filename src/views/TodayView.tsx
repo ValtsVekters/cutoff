@@ -1,10 +1,23 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { CaffeineChart } from '../components/CaffeineChart'
-import { amountAt, curve, cutoffTime, DAILY_LIMIT_MG, SAFE_MG, WARN_MG, type Drink } from '../lib/caffeine'
+import {
+  amountAt,
+  budgetAt,
+  curve,
+  cutoffTime,
+  DAILY_LIMIT_MG,
+  MIN_DRINK_MG,
+  SAFE_MG,
+  upcomingPeak,
+  WARN_MG,
+  type Drink,
+} from '../lib/caffeine'
 import { label, PRESETS } from '../lib/drinks'
 import { atClock, clock, dayStart } from '../lib/time'
 
-const DAY = 24 * 3_600_000
+const HOUR = 3_600_000
+const DAY = 24 * HOUR
+const NO_CAFFEINE_BEFORE_BED_H = 6
 
 const STATUS = {
   good: { box: 'bg-emerald-50 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100', dot: 'bg-emerald-500', label: 'Sleep-safe' },
@@ -38,8 +51,18 @@ export function TodayView({ now, drinks, bedClock, halfLife, metabolism, onAdd, 
   const data = curve(relevant, from, to, halfLife)
   const atBed = amountAt(relevant, bedtime, halfLife)
   const inBody = amountAt(relevant, now, halfLife)
-  const cutoff = now < bedtime ? cutoffTime(relevant, now, bedtime, halfLife) : null
+  const peak = upcomingPeak(relevant, now, halfLife)
   const total = today.reduce((s, d) => s + d.mg, 0)
+
+  // No caffeine in the last 6 h before bed (Drake et al., 2013), even when a
+  // small drink would technically stay under the bedtime limit.
+  const lastCall = bedtime - NO_CAFFEINE_BEFORE_BED_H * HOUR
+  const open = now < lastCall
+  const modelCutoff = open ? cutoffTime(relevant, now, bedtime, halfLife, MIN_DRINK_MG) : null
+  const cutoff = modelCutoff === null ? null : Math.min(modelCutoff, lastCall)
+  const budget = open ? Math.min(budgetAt(relevant, now, bedtime, halfLife), DAILY_LIMIT_MG - total) : 0
+  const budgetMg = Math.floor(budget / 5) * 5
+  const canTake = cutoff !== null && budgetMg >= MIN_DRINK_MG
   const status = atBed < SAFE_MG ? STATUS.good : atBed <= WARN_MG ? STATUS.warn : STATUS.bad
 
   const addCustom = (e: FormEvent) => {
@@ -74,11 +97,28 @@ export function TodayView({ now, drinks, bedClock, halfLife, metabolism, onAdd, 
           <span className="num text-6xl font-semibold tracking-tight">{Math.round(atBed)}</span>
           <span className="text-lg opacity-70">mg at bedtime</span>
         </div>
-        <div className="mt-4 flex items-center justify-between border-t border-current/10 pt-3 text-sm">
-          <span className="opacity-70">In your body now: <b className="num">{Math.round(inBody)} mg</b></span>
-          <span className="font-medium">
-            {cutoff ? <>Last safe coffee <b className="num">{clock(cutoff)}</b></> : 'No more caffeine today'}
-          </span>
+        <p className="mt-3 text-base font-medium">
+          {canTake ? (
+            <>
+              You can still take <b className="num">{budgetMg} mg</b> until <b className="num">{clock(cutoff)}</b>
+            </>
+          ) : (
+            'No more caffeine today'
+          )}
+        </p>
+        {canTake && (
+          <p className="text-xs opacity-70">
+            Less fits the later you drink. Nothing in the {NO_CAFFEINE_BEFORE_BED_H} h before bed.
+          </p>
+        )}
+
+        <div className="mt-4 border-t border-current/10 pt-3 text-sm opacity-70">
+          In your body now: <b className="num">{Math.round(inBody)} mg</b>
+          {peak && (
+            <span className="num block text-xs">
+              ↑ absorbing, peaks at {Math.round(peak.mg)} mg around {clock(peak.time)}
+            </span>
+          )}
         </div>
       </section>
 

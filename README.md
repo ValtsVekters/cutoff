@@ -14,7 +14,8 @@ Log what you drank and Cutoff shows a live curve of the caffeine in your body. I
 - Edit the time of any logged drink
 - Caffeine curve from 06:00 to 06:00, with "now", "bed" and a 50 mg sleep-safe line
 - Bedtime card with a traffic light: green < 50 mg, yellow 50–100 mg, red > 100 mg
-- "Last safe coffee" time: the latest time one more 95 mg coffee still leaves you under 50 mg at bedtime
+- Caffeine budget: "You can still take X mg until HH:MM" — the most you can drink now and stay under 50 mg at bedtime (and 400 mg/day), with no caffeine in the 6 h before bed
+- "In your body now" with an absorbing indicator showing when a new drink will peak
 - Daily total against the 400 mg/day guideline
 - Metabolism: Manual slider (half-life 3–7 h) or Auto, which learns it from Apple Health sleep data (iPhone app, coming soon; sample data for the demo)
 - Everything is stored locally in the browser: no login, no backend

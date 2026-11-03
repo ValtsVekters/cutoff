@@ -26,11 +26,16 @@ export default function App() {
   const effectiveHalfLife = mode === 'manual' ? halfLife : health === 'sample' ? SAMPLE_HEALTH.halfLifeH : DEFAULT_HALF_LIFE_H
 
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 30_000)
+    const id = setInterval(() => setNow(Date.now()), 10_000)
     return () => clearInterval(id)
   }, [])
 
-  const add = (name: string, mg: number) => setDrinks((ds) => [...ds, { id: newId(), name, mg, time: Date.now() }])
+  // Move the clock with the new drink, or the model sees it as "not drunk yet".
+  const add = (name: string, mg: number) => {
+    const t = Date.now()
+    setNow(t)
+    setDrinks((ds) => [...ds, { id: newId(), name, mg, time: t }])
+  }
   const remove = (id: string) => setDrinks((ds) => ds.filter((d) => d.id !== id))
   const retime = (id: string, time: number) => setDrinks((ds) => ds.map((d) => (d.id === id ? { ...d, time } : d)))
 
